@@ -15,14 +15,22 @@ export function CartProvider({ children }) {
         setItems((x) =>
           x.some((i) => i.id === p.id)
             ? x.map((i) =>
-                i.id === p.id ? { ...i, quantity: i.quantity + 1 } : i,
+                i.id === p.id && i.quantity < Number(p.stock || 0)
+                  ? { ...i, quantity: i.quantity + 1 }
+                  : i,
               )
-            : [...x, { ...p, quantity: 1 }],
+            : Number(p.stock || 0) > 0
+              ? [...x, { ...p, quantity: 1 }]
+              : x,
         ),
       removeProduct: (id) => setItems((x) => x.filter((i) => i.id !== id)),
       increaseQuantity: (id) =>
         setItems((x) =>
-          x.map((i) => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i)),
+          x.map((i) =>
+            i.id === id && i.quantity < Number(i.stock || 0)
+              ? { ...i, quantity: i.quantity + 1 }
+              : i,
+          ),
         ),
       decreaseQuantity: (id) =>
         setItems((x) =>

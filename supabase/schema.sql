@@ -27,6 +27,7 @@ CREATE TABLE public.products (
   slug TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL DEFAULT '',
   price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
+  stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
   category_id UUID NOT NULL REFERENCES public.categories(id) ON DELETE RESTRICT,
   image_path TEXT,
   active BOOLEAN NOT NULL DEFAULT true,
