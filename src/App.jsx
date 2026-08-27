@@ -44,6 +44,8 @@ function Store() {
     [cat, setCat] = useState(""),
     [error, setError] = useState("");
   const { addProduct, itemCount } = useCart();
+  const nav = useNavigate();
+  const [addedId, setAddedId] = useState(null);
   useEffect(() => {
     Promise.all([getProducts(true), getCategories(true)])
       .then(([a, b]) => {
@@ -58,6 +60,15 @@ function Store() {
       (!cat || p.category_id === cat) &&
       p.name.toLowerCase().includes(search.toLowerCase()),
   );
+  const addToCart = (product) => {
+    addProduct(product);
+    setAddedId(product.id);
+    window.setTimeout(() => setAddedId(null), 450);
+  };
+  const buyNow = (product) => {
+    addProduct(product);
+    nav("/cart");
+  };
   return (
     <main>
       <header>
@@ -109,9 +120,20 @@ function Store() {
                   <span className={stock ? "stock" : "stock out"}>
                     {stock ? `${stock} em estoque` : "Fora de estoque"}
                   </span>
-                  <button disabled={!stock} onClick={() => addProduct(p)}>
-                    {stock ? "Adicionar ao carrinho" : "IndisponÃ­vel"}
-                  </button>
+                   <div className="product-actions">
+                     <button
+                       className={addedId === p.id ? "add-to-cart added" : "add-to-cart"}
+                       disabled={!stock}
+                       onClick={() => addToCart(p)}
+                     >
+                       {stock ? (addedId === p.id ? "✓ Adicionado" : "Adicionar") : "Indisponível"}
+                     </button>
+                     {stock && (
+                       <button className="buy-now" onClick={() => buyNow(p)}>
+                         Comprar agora
+                       </button>
+                     )}
+                   </div>
                 </div>
               </article>
             );
@@ -170,22 +192,29 @@ function Cart() {
   };
   return (
     <main className="checkout">
-      <Link to="/">Continuar comprando</Link>
+      <Link to="/" className="continue-shopping">
+        <span aria-hidden="true">←</span> Ver mais produtos
+      </Link>
       <h1>Seu carrinho</h1>
       {!items.length ? (
         <p>Seu carrinho está vazio.</p>
       ) : (
         <>
           {items.map((i) => (
-            <div className="cart" key={i.id}>
+            <article className="cart" key={i.id}>
               <Img p={i} />
-              <span>{i.name}</span>
-              <button onClick={() => decreaseQuantity(i.id)}>Remover</button>
-              {i.quantity}
-              <button onClick={() => increaseQuantity(i.id)}>+</button>
-              <span>{formatCurrency(i.price * i.quantity)}</span>
-              <button onClick={() => removeProduct(i.id)}>Excluir</button>
-            </div>
+              <div className="cart-details">
+                <strong>{i.name}</strong>
+                <span>{formatCurrency(i.price)} cada</span>
+              </div>
+              <div className="quantity-control" aria-label={`Quantidade de ${i.name}`}>
+                <button aria-label={`Diminuir quantidade de ${i.name}`} onClick={() => decreaseQuantity(i.id)}>−</button>
+                <output>{i.quantity}</output>
+                <button aria-label={`Aumentar quantidade de ${i.name}`} onClick={() => increaseQuantity(i.id)}>+</button>
+              </div>
+              <strong className="cart-subtotal">{formatCurrency(i.price * i.quantity)}</strong>
+              <button className="remove-item" aria-label={`Excluir ${i.name} do carrinho`} onClick={() => removeProduct(i.id)}>🗑 <span>Excluir</span></button>
+            </article>
           ))}
           <h2>Total: {formatCurrency(total)}</h2>
           <label>
@@ -265,6 +294,7 @@ function Login() {
 }
 function AdminLayout({ children }) {
   const { user, profile, loading, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
   if (loading) return <main>Carregando...</main>;
   if (!user) return <Navigate to="/admin/login" replace />;
   if (!profile || !["admin", "staff"].includes(profile.role))
@@ -280,13 +310,22 @@ function AdminLayout({ children }) {
         <Link to="/" className="brand">
           {STORE_CONFIG.shortName}
         </Link>
-        <nav>
-          <Link to="/admin">Dashboard</Link>
-          <Link to="/admin/products">Produtos</Link>
-          <Link to="/admin/categories">Categorias</Link>
-          <Link to="/">Ver loja</Link>
+        <button
+          className="admin-menu-toggle"
+          aria-label="Abrir menu administrativo"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <nav className={menuOpen ? "open" : ""}>
+          <Link onClick={() => setMenuOpen(false)} to="/admin">Dashboard</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/admin/products">Produtos</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/admin/categories">Categorias</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/">Ver loja</Link>
+          <button className="admin-logout-mobile" onClick={logout}>Sair</button>
         </nav>
-        <button onClick={logout}>Sair</button>
+        <button className="admin-logout-desktop" onClick={logout}>Sair</button>
       </header>
       <div className="admin-body">
         <aside>
@@ -627,8 +666,8 @@ function Categories() {
     const { error } = await deleteCategory(c.id);
     setMsg(
       error
-        ? "NÃ£o Ã© possÃ­vel excluir esta categoria porque existem produtos associados a ela."
-        : "Categoria excluÃ­da com sucesso.",
+        ? "Não foi possível excluir esta categoria porque existem produtos associados a ela."
+        : "Categoria excluída com sucesso.",
     );
     if (!error) load();
   };
