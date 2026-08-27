@@ -247,15 +247,15 @@ function Cart() {
       )
       .join("\n");
     const text =
-      "Olá! Gostaria de fazer um pedido.\n\n*PEDIDO*\n\n" +
+      "*CONFIRMAÇÃO DE PEDIDO*\n\n *ITEM:* " +
       lines +
+      "\n*Cliente:* " +
+      name +
+      "\n*Forma de entrega:* " +
+      delivery +
       "\n\n*Total:* " +
       formatCurrency(total) +
-      "\n\n*Cliente:* " +
-      name +
-      "\n\n*Forma de entrega:* " +
-      delivery +
-      (note ? "\n\n*Observação:*\n" + note : "");
+      (note ? "\n\n*📝 Observação*\n" + note : "");
     window.open(
       "https://wa.me/" +
         STORE_CONFIG.whatsapp +

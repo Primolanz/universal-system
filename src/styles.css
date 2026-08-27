@@ -283,7 +283,8 @@ footer {
 
 .admin header nav {
     display: flex;
-    gap: 12px;
+    gap: 16px;
+    font-weight: 600;
     align-items: center;
 
 }
