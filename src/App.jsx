@@ -6,7 +6,7 @@
   useParams,
   Navigate,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider, useCart } from "./context/CartContext";
 import { STORE_CONFIG } from "./config/store";
@@ -15,6 +15,7 @@ import {
   getProductById,
   createProduct,
   updateProduct,
+  updateProductStock,
   toggleProductStatus,
   deleteProduct,
 } from "./services/products";
@@ -459,6 +460,7 @@ function Products() {
   const [items, setItems] = useState([]),
     [msg, setMsg] = useState(""),
     [loading, setLoading] = useState(true);
+  const stockQueues = useRef({});
   const load = () => {
     setLoading(true);
     getProducts()
@@ -477,6 +479,27 @@ function Products() {
         : "Produto " + (!p.active ? "ativado" : "desativado") + " com sucesso.",
     );
     if (!error) load();
+  };
+  const changeStock = async (p, delta) => {
+    const queued = stockQueues.current[p.id];
+    const current = Math.max(0, Number(queued?.value ?? p.stock ?? 0));
+    const next = Math.max(0, current + delta);
+    if (next === current) return;
+
+    setItems((list) => list.map((item) => item.id === p.id ? { ...item, stock: next } : item));
+    const previous = queued?.promise || Promise.resolve();
+    const promise = previous.then(async () => {
+      const result = await updateProductStock(p.id, next);
+      if (result.error) {
+        setItems((list) => list.map((item) => item.id === p.id ? { ...item, stock: current } : item));
+        setMsg(friendlyError(result.error));
+      }
+      return result;
+    });
+    stockQueues.current[p.id] = { value: next, promise };
+    promise.finally(() => {
+      if (stockQueues.current[p.id]?.promise === promise) delete stockQueues.current[p.id];
+    });
   };
   const del = async (p) => {
     if (!confirm("Tem certeza que deseja excluir este produto?")) return;
@@ -499,14 +522,34 @@ function Products() {
       ) : (
         <div className="table">
           {items.map((p) => (
-            <article className="row" key={p.id}>
+            <article className="row product-row" key={p.id}>
               <Img p={p} />
               <div>
                 <strong>{p.name}</strong>
                 <small>{p.categories?.name || "Sem categoria"}</small>
               </div>
               <span>{formatCurrency(p.price)}</span>
-              <span className="stock">Estoque: {Number(p.stock || 0)}</span>
+              <div className="stock-control" aria-label={`Estoque de ${p.name}`}>
+                <span className="stock-label">Estoque:</span>
+                <button
+                  type="button"
+                  className="stock-step"
+                  aria-label={`Diminuir estoque de ${p.name}`}
+                  onClick={() => changeStock(p, -1)}
+                  disabled={Number(p.stock || 0) <= 0}
+                >
+                  −
+                </button>
+                <span className="stock">{Number(p.stock || 0)}</span>
+                <button
+                  type="button"
+                  className="stock-step"
+                  aria-label={`Aumentar estoque de ${p.name}`}
+                  onClick={() => changeStock(p, 1)}
+                >
+                  +
+                </button>
+              </div>
               <span className={p.active ? "status on" : "status"}>
                 {p.active ? "Ativo" : "Inativo"}
               </span>

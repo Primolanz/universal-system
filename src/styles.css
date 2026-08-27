@@ -344,8 +344,9 @@ footer {
 
 .row {
     display: grid;
-    grid-template-columns: 70px minmax(150px, 1fr) 110px 100px 90px 250px;
-    gap: 14px;
+    grid-template-columns: 70px minmax(150px, 1fr) 110px 170px 90px 250px;
+    column-gap: 18px;
+    row-gap: 14px;
     align-items: center;
     background: #fff;
     padding: 10px;
@@ -361,6 +362,74 @@ footer {
 
 .row small {
     display: block
+}
+
+.stock-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    white-space: nowrap;
+    color: #047857;
+    font-size: 13px
+}
+
+.stock-label {
+    margin-right: 10px
+}
+
+.stock-step {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    flex: 0 0 34px;
+    padding: 0;
+    border: 1px solid #d8e0ec;
+    border-radius: 0;
+    background: #f1f5f9;
+    color: #102a56;
+    font-size: 17px;
+    line-height: 1;
+    box-shadow: none;
+    font-weight: 700
+}
+
+.stock-step:first-of-type {
+    border-radius: 10px 0 0 10px
+}
+
+.stock-step:last-of-type {
+    border-radius: 0 10px 10px 0
+}
+
+.stock-step + .stock-step {
+    border-left: 0
+}
+
+.stock-step:hover:not(:disabled) {
+    background: #e5e7eb
+}
+
+.stock-step:disabled {
+    cursor: not-allowed;
+    opacity: .45
+}
+
+.stock-control .stock {
+    min-width: 34px;
+    height: 34px;
+    margin-top: 0;
+    flex: 0 0 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #d8e0ec;
+    border-bottom: 1px solid #d8e0ec;
+    border-left: 1px solid #d8e0ec;
+    border-right: 1px solid #d8e0ec;
+    background: #fff;
+    color: #102a56;
+    font-weight: 700;
+    text-align: center
 }
 
 .row-actions {
@@ -384,11 +453,13 @@ footer {
 }
 
 .status {
-    color: #991b1b
+    color: #991b1b;
+    margin-left: 4px
 }
 
 .status.on {
-    color: #15803d
+    color: #15803d;
+    text-align: center;
 }
 
 .form {
@@ -473,8 +544,22 @@ footer {
     }
 
     .row>span,
+    .row>.stock-control,
     .row-actions {
         grid-column: 2
+    }
+
+    .product-row>.stock-control {
+        grid-row: 3;
+        justify-self: start
+    }
+
+    .product-row>.status {
+        grid-column: 2;
+        grid-row: 3;
+        align-self: center;
+        justify-self: end;
+        margin-left: 12px
     }
 
     .category-row>strong {
@@ -1069,9 +1154,10 @@ footer {
 
 .product-detail {
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
-    align-items: center;
-    overflow: hidden;
+    grid-template-columns: minmax(280px, 440px) minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(24px, 4vw, 52px);
+    padding: clamp(18px, 3vw, 32px);
     background: #fff;
     border: 1px solid #e2e8f0;
     border-radius: 24px;
@@ -1079,21 +1165,27 @@ footer {
 }
 
 .product-detail-image {
-    height: 420px;
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #e8edf7
 }
 
 .product-detail-image img,
 .product-detail-image .placeholder {
+    display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover
+    object-fit: contain
 }
 
 .product-detail-content {
     display: flex;
     flex-direction: column;
-    padding: clamp(24px, 5vw, 52px)
+    min-width: 0;
+    padding: clamp(6px, 1vw, 16px) 0
 }
 
 .product-detail-content small {
@@ -1135,8 +1227,12 @@ footer {
 
 .product-detail-actions button { min-height: 48px }
 
-@media(max-width:700px) {
-    .product-detail { grid-template-columns: 1fr }
+@media(max-width:480px) {
+    .product-detail {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 16px
+    }
     .product-detail-image,
     .product-detail-image img,
     .product-detail-image .placeholder { min-height: 0; height: min(72vw, 420px) }
