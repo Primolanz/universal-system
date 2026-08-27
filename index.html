@@ -1,16 +1,18 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Catálogo online" />
     <title>Loja</title>
-</head>
-
-<body>
+    <style>
+      #initial-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:linear-gradient(135deg,#f5f7fb,#e8efff);color:#172554;font-family:Inter,system-ui,sans-serif}
+      .initial-loader-content{text-align:center}.initial-loader-mark{display:inline-grid;place-items:center;width:58px;height:58px;margin-bottom:16px;border-radius:18px;background:linear-gradient(135deg,#4338ca,#2563eb);color:#fff;font-size:1.4rem;font-weight:800;box-shadow:0 12px 24px #3730a540}.initial-loader-spinner{width:30px;height:30px;margin:18px auto 0;border:3px solid #c7d2fe;border-top-color:#4338ca;border-radius:50%;animation:initial-spin .8s linear infinite}@keyframes initial-spin{to{transform:rotate(360deg)}}
+    </style>
+  </head>
+  <body>
+    <div id="initial-loader" role="status" aria-live="polite"><div class="initial-loader-content"><div class="initial-loader-mark">L</div><strong>Carregando sua loja</strong><div class="initial-loader-spinner"></div></div></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-</body>
-
+  </body>
 </html>

@@ -231,14 +231,15 @@ function Login() {
   return (
     <main className="login">
       <h1>Área administrativa</h1>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} autoComplete="off">
         <label>
           E-mail
           <input
             type="email"
             required
+            autoComplete="off"
             value={email}
-            placeholder="Digite aqui seu email..."
+            placeholder="Digite aqui seu e-mail..."
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
@@ -247,13 +248,17 @@ function Login() {
           <input
             type="password"
             required
+            autoComplete="new-password"
             placeholder="Digite aqui sua senha..."
             value={pass}
             onChange={(e) => setPass(e.target.value)}
           />
         </label>
         {err && <p className="error">{err}</p>}
-        <button>Entrar</button>
+        <div className="login-actions">
+          <Link className="button secondary" to="/">Voltar para a loja</Link>
+          <button>Entrar</button>
+        </div>
       </form>
     </main>
   );
@@ -739,5 +744,6 @@ export default () => (
     </CartProvider>
   </AuthProvider>
 );
+
 
 
