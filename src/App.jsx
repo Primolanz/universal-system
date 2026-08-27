@@ -112,10 +112,16 @@ function Store() {
             const stock = Number(p.stock || 0);
             return (
               <article className="card" key={p.id}>
-                <Img p={p} />
+                <Link
+                  className="card-details-link"
+                  to={`/products/${p.id}`}
+                  aria-label={`Ver detalhes de ${p.name}`}
+                >
+                  <Img p={p} />
+                </Link>
                 <div className="card-content">
                   <small>{p.categories?.name}</small>
-                  <h2>{p.name}</h2>
+                  <h2><Link to={`/products/${p.id}`}>{p.name}</Link></h2>
                   <strong>{formatCurrency(p.price)}</strong>
                   <span className={stock ? "stock" : "stock out"}>
                     {stock ? `${stock} em estoque` : "Fora de estoque"}
@@ -144,6 +150,74 @@ function Store() {
       <footer>
         © {new Date().getFullYear()} {STORE_CONFIG.name}
       </footer>
+    </main>
+  );
+}
+function ProductDetails() {
+  const { id } = useParams();
+  const nav = useNavigate();
+  const { addProduct, itemCount } = useCart();
+  const [product, setProduct] = useState(null);
+  const [error, setError] = useState("");
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    getProductById(id).then(({ data, error: loadError }) => {
+      if (loadError || !data || !data.active) {
+        setError("Produto não encontrado ou indisponível.");
+        return;
+      }
+      setProduct(data);
+    });
+  }, [id]);
+
+  const addToCart = () => {
+    addProduct(product);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 900);
+  };
+
+  if (error)
+    return (
+      <main className="product-page">
+        <Link to="/" className="continue-shopping">← Voltar para a loja</Link>
+        <p className="error">{error}</p>
+      </main>
+    );
+  if (!product) return <main className="product-page">Carregando produto...</main>;
+
+  const stock = Number(product.stock || 0);
+  return (
+    <main className="product-page">
+      <header>
+        <Link to="/" className="brand">{STORE_CONFIG.name}</Link>
+        <Link to="/cart" className="cart-link">
+          Carrinho <span className="cart-badge">{itemCount}</span>
+        </Link>
+      </header>
+      <button className="back-link" onClick={() => nav(-1)}>← Voltar</button>
+      <section className="product-detail">
+        <div className="product-detail-image"><Img p={product} /></div>
+        <div className="product-detail-content">
+          {product.categories?.name && <small>{product.categories.name}</small>}
+          <h1>{product.name}</h1>
+          <strong className="product-detail-price">{formatCurrency(product.price)}</strong>
+          <span className={stock ? "stock" : "stock out"}>
+            {stock ? `${stock} em estoque` : "Fora de estoque"}
+          </span>
+          {product.description ? (
+            <p className="product-description">{product.description}</p>
+          ) : (
+            <p className="product-description muted">Este produto ainda não possui uma descrição.</p>
+          )}
+          <div className="product-detail-actions">
+            <button disabled={!stock} onClick={addToCart} className={added ? "add-to-cart added" : "add-to-cart"}>
+              {stock ? (added ? "✓ Adicionado ao carrinho" : "Adicionar ao carrinho") : "Indisponível"}
+            </button>
+            {stock && <button className="buy-now" onClick={() => { addProduct(product); nav("/cart"); }}>Comprar agora</button>}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
@@ -233,7 +307,11 @@ function Cart() {
           </label>
           <label>
             Observação
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} />
+            <textarea
+              value={note}
+              maxLength={250}
+              onChange={(e) => setNote(e.target.value)}
+            />
           </label>
           <button onClick={finish}>Finalizar pedido pelo WhatsApp</button>
         </>
@@ -737,6 +815,7 @@ export default () => (
     <CartProvider>
       <Routes>
         <Route path="/" element={<Store />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/admin/login" element={<Login />} />
         <Route
