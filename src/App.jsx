@@ -247,10 +247,10 @@ function Cart() {
       )
       .join("\n");
     const text =
-      "*CONFIRMAÇÃO DE PEDIDO*\n\n *ITEM:* " +
-      lines +
-      "\n*Cliente:* " +
+      "*CONFIRMAÇÃO DE PEDIDO*\n\n *Cliente:* " +
       name +
+      "\n*Item:* " +
+      lines +
       "\n*Forma de entrega:* " +
       delivery +
       "\n\n*Total:* " +
