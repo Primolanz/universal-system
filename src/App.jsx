@@ -453,8 +453,8 @@ function ProductForm() {
     if (!f) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type))
       return setMsg("Formato de imagem não suportado. Use JPG, PNG ou WEBP.");
-    if (f.size > 5242880)
-      return setMsg("Imagem muito grande. O máximo são 5 MB.");
+    if (f.size > 52428800)
+      return setMsg("Imagem muito grande. O máximo são 50 MB.");
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setMsg("");
@@ -744,6 +744,7 @@ export default () => (
     </CartProvider>
   </AuthProvider>
 );
+
 
 
 

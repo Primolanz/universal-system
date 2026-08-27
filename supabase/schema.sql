@@ -1,4 +1,4 @@
--- Extensões
+﻿-- ExtensÃµes
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 1. Tabela: profiles
@@ -35,7 +35,7 @@ CREATE TABLE public.products (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Funções
+-- FunÃ§Ãµes
 CREATE OR REPLACE FUNCTION public.is_staff()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -82,7 +82,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
--- Políticas de Segurança (RLS)
+-- PolÃ­ticas de SeguranÃ§a (RLS)
 CREATE POLICY "profile own read"
   ON public.profiles
   FOR SELECT
@@ -113,13 +113,13 @@ CREATE POLICY "staff products"
   USING (public.is_staff())
   WITH CHECK (public.is_staff());
 
--- Configuração do Storage de Imagens
+-- ConfiguraÃ§Ã£o do Storage de Imagens
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
   'product-images',
   'product-images',
   true,
-  5242880,
+  52428800,
   ARRAY['image/jpeg', 'image/png', 'image/webp']
 )
 ON CONFLICT (id) DO NOTHING;
@@ -136,5 +136,6 @@ CREATE POLICY "staff manage product images"
   USING (bucket_id = 'product-images' AND public.is_staff())
   WITH CHECK (bucket_id = 'product-images' AND public.is_staff());
 
--- Compatibilidade para bancos criados em versões anteriores do template.
+-- Compatibilidade para bancos criados em versÃµes anteriores do template.
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS category_id UUID;
+
