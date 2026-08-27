@@ -255,7 +255,7 @@ function Cart() {
       delivery +
       "\n\n*Total:* " +
       formatCurrency(total) +
-      (note ? "\n\n*📝 Observação*\n" + note : "");
+      (note ? "\n\n*Observação*\n" + note : "");
     window.open(
       "https://wa.me/" +
         STORE_CONFIG.whatsapp +
