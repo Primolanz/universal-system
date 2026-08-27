@@ -135,3 +135,6 @@ CREATE POLICY "staff manage product images"
   TO authenticated
   USING (bucket_id = 'product-images' AND public.is_staff())
   WITH CHECK (bucket_id = 'product-images' AND public.is_staff());
+
+-- Compatibilidade para bancos criados em versões anteriores do template.
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS category_id UUID;
