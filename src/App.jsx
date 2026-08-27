@@ -447,9 +447,9 @@ function ProductForm() {
     const f = e.target.files?.[0];
     if (!f) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(f.type))
-      return setMsg("Formato de imagem nÃ£o suportado. Use JPG, PNG ou WEBP.");
+      return setMsg("Formato de imagem não suportado. Use JPG, PNG ou WEBP.");
     if (f.size > 5242880)
-      return setMsg("Imagem muito grande. O mÃ¡ximo Ã© 5 MB.");
+      return setMsg("Imagem muito grande. O máximo são 5 MB.");
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setMsg("");
